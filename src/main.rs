@@ -2,6 +2,7 @@ extern crate env_logger;
 extern crate goji;
 
 use goji::{Credentials, Jira};
+// use goji::issues::{IssueType};
 use std::env;
 
 fn main() -> Result<(), &'static str> {
@@ -20,7 +21,25 @@ fn main() -> Result<(), &'static str> {
         match jira.search().iter(query, &Default::default()) {
             Ok(results) => {
                 for issue in results {
-                    println!("{:#?}", issue);
+                    // println!("{:#?}", issue);
+                    match issue.project() {
+                        None => println!("Project unkown!"),
+                        Some(project) => println!("{}", project.key.as_str()),
+                    };
+                    println!("{0}\t{1}", issue.key, issue.summary().unwrap_or("unset".to_owned()));
+                    // println!("{0}", issue.field("Story points").unwrap_or(Ok("unset".to_owned())).unwrap_or("error".to_owned()));
+                    match issue.issue_type() {
+                        None => {
+                            println!("Unknown type!");
+                        }
+                        Some(issue_type) => {
+                            println!("{0}", issue_type.name)
+                        }
+                    }
+                    // for (key, value) in issue.fields.iter() {
+                    //     println!("{0} {1:#?}", key, value);
+                    // }
+                    println!("-----");
                 }
             }
             Err(err) => panic!("{:#?}", err),
