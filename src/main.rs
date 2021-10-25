@@ -23,7 +23,7 @@ fn main() -> Result<(), &'static str> {
                 for issue in results {
                     // println!("{:#?}", issue);
                     match issue.project() {
-                        None => println!("Project unkown!"),
+                        None => println!("Project unknown!"),
                         Some(project) => println!("{}", project.key.as_str()),
                     };
                     println!("{0}\t{1}", issue.key, issue.summary().unwrap_or("unset".to_owned()));
