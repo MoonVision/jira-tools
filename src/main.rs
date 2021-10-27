@@ -99,6 +99,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 .unwrap_or(&0.0)
                                 + story_points.unwrap_or(0.0),
                         );
+                        if story_points == None {
+                            story_points_unset_by_issue_type.insert(
+                                issue_type.name.clone(),
+                                story_points_unset_by_issue_type
+                                    .get(&issue_type.name)
+                                    .unwrap_or(&0)
+                                    + 1,
+                            );
+                        }
                     }
                     if let Some(status) = issue.status() {
                         issue_count_by_status.insert(
@@ -115,15 +124,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 .unwrap_or(&0.0)
                                 + story_points.unwrap_or(0.0),
                         );
-                        if story_points == None {
-                            story_points_unset_by_issue_type.insert(
-                                status.name.clone(),
-                                story_points_unset_by_issue_type
-                                    .get(&status.name)
-                                    .unwrap_or(&0)
-                                    + 1,
-                            );
-                        }
                     }
                     total_issue_count += 1;
                     total_story_points += story_points.unwrap_or(0.0);
