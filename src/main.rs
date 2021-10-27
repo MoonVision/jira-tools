@@ -110,17 +110,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                     }
                     if let Some(status) = issue.status() {
+                        let status_name = if status.name.to_lowercase().contains("review") {
+                            String::from("Review")
+                        } else {
+                            status.name.clone()
+                        };
                         issue_count_by_status.insert(
-                            status.name.clone(),
+                            status_name.clone(),
                             issue_count_by_status
-                                .get(&status.name)
+                                .get(&status_name)
                                 .unwrap_or(&0)
                                 + 1,
                         );
                         story_points_by_status.insert(
-                            status.name.clone(),
+                            status_name.clone(),
                             story_points_by_status
-                                .get(&status.name)
+                                .get(&status_name)
                                 .unwrap_or(&0.0)
                                 + story_points.unwrap_or(0.0),
                         );
