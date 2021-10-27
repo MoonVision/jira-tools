@@ -1,12 +1,10 @@
 extern crate env_logger;
 extern crate goji;
-use goji::issues::IssueType;
 use goji::{Credentials, Jira};
 use serde_derive::Deserialize;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap};
 use std::env;
 use std::io::{Error, ErrorKind};
-use url::form_urlencoded;
 
 fn create_error(error: &str) -> Result<(), Box<dyn std::error::Error>> {
     Err(Box::new(Error::new(ErrorKind::Other, error)))
@@ -14,9 +12,9 @@ fn create_error(error: &str) -> Result<(), Box<dyn std::error::Error>> {
 
 #[derive(Deserialize, Debug)]
 struct JiraField {
-    custom: bool,
+    // custom: bool,
     id: String,
-    key: String,
+    // key: String,
     name: String,
 }
 
@@ -34,6 +32,65 @@ fn larger_option_number<N: std::cmp::PartialOrd>(a: Option<N>, b: Option<N>) -> 
         },
         None => b,
     }
+}
+
+fn print_stats_for_humans(
+    issue_count_by_status: &HashMap<String, u32>,
+    issue_count_by_issue_type: &HashMap<String, u32>,
+    story_points_by_status: &HashMap<String, f64>,
+    story_points_by_issue_type: &HashMap<String, f64>,
+    story_points_unset_by_issue_type: &HashMap<String, u32>,
+    total_story_points: f64,
+    total_issue_count: u32
+) {
+    println!("\nIssue count by issue type:");
+    println!("==========================");
+    issue_count_by_issue_type
+        .iter()
+        .for_each(|(issue_type, issue_count)| {
+            println!("Issue type:   {}", issue_type);
+            println!("Issue count:  {}", issue_count);
+            println!("-----");
+        });
+
+    println!("\nStory points by issue type:");
+    println!("===========================");
+    story_points_by_issue_type
+        .iter()
+        .for_each(|(issue_type, story_points)| {
+            println!("Issue type:   {}", issue_type);
+            println!("Story points: {}", story_points);
+            println!("-----");
+        });
+
+    println!("\nUnset SPs by issue type:");
+    println!("========================");
+    story_points_unset_by_issue_type.iter().for_each(|(issue_type, unset_count)| {
+        println!("Issue type:   {}", issue_type);
+        println!("Unset count:  {}", unset_count);
+        println!("-----");
+    });
+
+    println!("\nIssue count by status:");
+    println!("======================");
+    issue_count_by_status.iter().for_each(|(status, issue_count)| {
+        println!("Status:       {}", status);
+        println!("Issue count:  {}", issue_count);
+        println!("-----");
+    });
+
+    println!("\nStory points by status:");
+    println!("=======================");
+    story_points_by_status.iter().for_each(|(status, story_points)| {
+        println!("Status:       {}", status);
+        println!("Story points: {}", story_points);
+        println!("-----");
+    });
+
+    println!("\nTotals:");
+    println!("=========");
+    println!("Issue count:      {}", total_issue_count);
+    println!("Story points:     {}", total_story_points);
 }
 
 #[tokio::main]
@@ -137,54 +194,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Err(err) => panic!("{:#?}", err),
         }
 
-        println!("\nIssue count by issue type:");
-        println!("==========================");
-        issue_count_by_issue_type
-            .iter()
-            .for_each(|(issue_type, issue_count)| {
-                println!("Issue type:   {}", issue_type);
-                println!("Issue count:  {}", issue_count);
-                println!("-----");
-            });
-
-        println!("\nStory points by issue type:");
-        println!("===========================");
-        story_points_by_issue_type
-            .iter()
-            .for_each(|(issue_type, story_points)| {
-                println!("Issue type:   {}", issue_type);
-                println!("Story points: {}", story_points);
-                println!("-----");
-            });
-
-        println!("\nUnset SPs by issue type:");
-        println!("========================");
-        story_points_unset_by_issue_type.iter().for_each(|(issue_type, unset_count)| {
-            println!("Issue type:   {}", issue_type);
-            println!("Unset count:  {}", unset_count);
-            println!("-----");
-        });
-
-        println!("\nIssue count by status:");
-        println!("======================");
-        issue_count_by_status.iter().for_each(|(status, issue_count)| {
-            println!("Status:       {}", status);
-            println!("Issue count:  {}", issue_count);
-            println!("-----");
-        });
-
-        println!("\nStory points by status:");
-        println!("=======================");
-        issue_count_by_status.iter().for_each(|(status, story_points)| {
-            println!("Status:       {}", status);
-            println!("Story points: {}", story_points);
-            println!("-----");
-        });
-
-        println!("\nTotals:");
-        println!("=========");
-        println!("Issue count:      {}", total_issue_count);
-        println!("Story points:     {}", total_story_points);
+        print_stats_for_humans(
+            &issue_count_by_status,
+            &issue_count_by_issue_type,
+            &story_points_by_status,
+            &story_points_by_issue_type,
+            &story_points_unset_by_issue_type,
+            total_story_points,
+            total_issue_count,
+        );
         Ok(())
     } else {
         create_error("Env variables JIRA_HOST, JIRA_USER & JIRA_PASS need to be set!")
