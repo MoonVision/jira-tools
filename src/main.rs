@@ -2,7 +2,7 @@ extern crate env_logger;
 extern crate goji;
 use goji::{Credentials, Jira};
 use serde_derive::Deserialize;
-use std::collections::{HashMap};
+use std::collections::HashMap;
 use std::env;
 use std::io::{Error, ErrorKind};
 
@@ -41,7 +41,7 @@ fn print_stats_for_humans(
     story_points_by_issue_type: &HashMap<String, f64>,
     story_points_unset_by_issue_type: &HashMap<String, u32>,
     total_story_points: f64,
-    total_issue_count: u32
+    total_issue_count: u32,
 ) {
     println!("\nIssue count by issue type:");
     println!("==========================");
@@ -65,27 +65,33 @@ fn print_stats_for_humans(
 
     println!("\nUnset SPs by issue type:");
     println!("========================");
-    story_points_unset_by_issue_type.iter().for_each(|(issue_type, unset_count)| {
-        println!("Issue type:   {}", issue_type);
-        println!("Unset count:  {}", unset_count);
-        println!("-----");
-    });
+    story_points_unset_by_issue_type
+        .iter()
+        .for_each(|(issue_type, unset_count)| {
+            println!("Issue type:   {}", issue_type);
+            println!("Unset count:  {}", unset_count);
+            println!("-----");
+        });
 
     println!("\nIssue count by status:");
     println!("======================");
-    issue_count_by_status.iter().for_each(|(status, issue_count)| {
-        println!("Status:       {}", status);
-        println!("Issue count:  {}", issue_count);
-        println!("-----");
-    });
+    issue_count_by_status
+        .iter()
+        .for_each(|(status, issue_count)| {
+            println!("Status:       {}", status);
+            println!("Issue count:  {}", issue_count);
+            println!("-----");
+        });
 
     println!("\nStory points by status:");
     println!("=======================");
-    story_points_by_status.iter().for_each(|(status, story_points)| {
-        println!("Status:       {}", status);
-        println!("Story points: {}", story_points);
-        println!("-----");
-    });
+    story_points_by_status
+        .iter()
+        .for_each(|(status, story_points)| {
+            println!("Status:       {}", status);
+            println!("Story points: {}", story_points);
+            println!("-----");
+        });
 
     println!("\nTotals:");
     println!("=========");
@@ -174,16 +180,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         };
                         issue_count_by_status.insert(
                             status_name.clone(),
-                            issue_count_by_status
-                                .get(&status_name)
-                                .unwrap_or(&0)
-                                + 1,
+                            issue_count_by_status.get(&status_name).unwrap_or(&0) + 1,
                         );
                         story_points_by_status.insert(
                             status_name.clone(),
-                            story_points_by_status
-                                .get(&status_name)
-                                .unwrap_or(&0.0)
+                            story_points_by_status.get(&status_name).unwrap_or(&0.0)
                                 + story_points.unwrap_or(0.0),
                         );
                     }
