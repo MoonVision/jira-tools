@@ -6,6 +6,7 @@ pkgs.mkShell {
   nativeBuildInputs = with pkgs.latest.rustChannels.nightly; [
     cargo
     rust
+    pkgs.pre-commit
     pkgs.rustfmt
   ];
   buildInputs = [

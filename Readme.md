@@ -26,14 +26,3 @@ Email address.
 
 ### `JIRA_PASS`
 Atlassian API token https://id.atlassian.com/manage-profile/security/api-tokens.
-
-## Contribute
-
-### pre-commit hooks:
-
-Requires Python. Activate them with:
-
-```
-pip install --user pre-commit
-pre-commit install
-```
