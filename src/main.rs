@@ -155,6 +155,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 .unwrap_or(&0)
                                 + 1,
                         );
+                        if issue_type.name.to_lowercase().contains("epic") {
+                            continue;
+                        }
                         story_points_by_issue_type.insert(
                             issue_type.name.clone(),
                             story_points_by_issue_type
