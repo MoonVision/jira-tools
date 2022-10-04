@@ -1,11 +1,9 @@
 let
-  moz_overlay = import (builtins.fetchTarball https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz);
-  pkgs = import <nixpkgs> { overlays = [ moz_overlay ]; };
+  pkgs = import <nixpkgs> { };
 in
 pkgs.mkShell {
-  nativeBuildInputs = with pkgs.latest.rustChannels.nightly; [
-    cargo
-    rust
+  nativeBuildInputs = [
+    pkgs.cargo
     pkgs.pre-commit
     pkgs.rustfmt
   ];
