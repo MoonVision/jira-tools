@@ -7,7 +7,7 @@
   Security
 }:
 let
-  optionals = stdenv.lib.optionals;
+  optionals = stdenv.optionals;
   isDarwin = stdenv.isDarwin;
 #let
 #  pkgs = import <nixpkgs> { };
