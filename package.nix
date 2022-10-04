@@ -1,4 +1,5 @@
 { rustPlatform,
+  lib,
   stdenv,
   AppKit,
   CoreFoundation,
@@ -7,10 +8,10 @@
   Security
 }:
 let
-  optionals = stdenv.optionals;
   isDarwin = stdenv.isDarwin;
 #let
 #  pkgs = import <nixpkgs> { };
+#  lib = pkgs.lib;
 #  rustPlatform = pkgs.rustPlatform;
 #  optionals = pkgs.lib.optionals;
 #  isDarwin = pkgs.stdenv.isDarwin;
@@ -28,7 +29,7 @@ rustPlatform.buildRustPackage rec {
 
   cargoSha256 = "sha256-K54xldM+1hUn84CHCr7CL23bjZdx7tWAPKDYfamOlZI=";
 
-  buildInputs = optionals isDarwin [
+  buildInputs = lib.optionals isDarwin [
     AppKit
     CoreFoundation
     CoreServices
