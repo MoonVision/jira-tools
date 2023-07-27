@@ -109,11 +109,12 @@ struct JiraToolsConfig {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     drop(env_logger::init());
-
+    let xdg_dirs = xdg::BaseDirectories::with_prefix("jira-tools").unwrap();
+    let xdg_config_path = xdg_dirs.get_config_file("jira-tools.toml");
+    let xdg_config = xdg_config_path.to_str().unwrap_or("jira-tools.toml");
     let cb: Result<JiraToolsConfig, config::ConfigError> = config::Config::builder()
         .add_source(config::File::with_name("jira-tools.toml").required(false))
-        .add_source(config::File::with_name("~/.config/jira-tools.toml").required(false))
-        .add_source(config::File::with_name("/etc/jira-tools.toml").required(false))
+        .add_source(config::File::with_name(xdg_config).required(false))
         .add_source(config::Environment::with_prefix("JIRA"))
         .build()?
         .try_deserialize();
