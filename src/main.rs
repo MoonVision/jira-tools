@@ -48,8 +48,8 @@ fn print_stats_for_humans(
     issue_count_by_issue_type
         .iter()
         .for_each(|(issue_type, issue_count)| {
-            println!("Issue type:   {}", issue_type);
-            println!("Issue count:  {}", issue_count);
+            println!("Issue type:   {issue_type}");
+            println!("Issue count:  {issue_count}");
             println!("-----");
         });
 
@@ -58,8 +58,8 @@ fn print_stats_for_humans(
     story_points_by_issue_type
         .iter()
         .for_each(|(issue_type, story_points)| {
-            println!("Issue type:   {}", issue_type);
-            println!("Story points: {}", story_points);
+            println!("Issue type:   {issue_type}");
+            println!("Story points: {story_points}");
             println!("-----");
         });
 
@@ -68,8 +68,8 @@ fn print_stats_for_humans(
     story_points_unset_by_issue_type
         .iter()
         .for_each(|(issue_type, unset_count)| {
-            println!("Issue type:   {}", issue_type);
-            println!("Unset count:  {}", unset_count);
+            println!("Issue type:   {issue_type}");
+            println!("Unset count:  {unset_count}");
             println!("-----");
         });
 
@@ -78,8 +78,8 @@ fn print_stats_for_humans(
     issue_count_by_status
         .iter()
         .for_each(|(status, issue_count)| {
-            println!("Status:       {}", status);
-            println!("Issue count:  {}", issue_count);
+            println!("Status:       {status}");
+            println!("Issue count:  {issue_count}");
             println!("-----");
         });
 
@@ -88,15 +88,15 @@ fn print_stats_for_humans(
     story_points_by_status
         .iter()
         .for_each(|(status, story_points)| {
-            println!("Status:       {}", status);
-            println!("Story points: {}", story_points);
+            println!("Status:       {status}");
+            println!("Story points: {story_points}");
             println!("-----");
         });
 
     println!("\nTotals:");
     println!("=========");
-    println!("Issue count:      {}", total_issue_count);
-    println!("Story points:     {}", total_story_points);
+    println!("Issue count:      {total_issue_count}");
+    println!("Story points:     {total_story_points}");
 }
 
 #[tokio::main]
@@ -107,7 +107,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         env::var("JIRA_USER"),
         env::var("JIRA_PASS"),
     ) {
-        let field_endpoint = format!("{}/rest/api/3/field", jira_host);
+        let field_endpoint = format!("{jira_host}/rest/api/3/field");
         let resp = reqwest::Client::new()
             .get(field_endpoint)
             .basic_auth(jira_user.clone(), Some(jira_pass.clone()))
@@ -124,7 +124,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             });
 
         let first_arg = env::args().nth(1);
-        if first_arg == None {
+        if first_arg.is_none() {
             return create_error("Argument JIRA_QUERY required!");
         }
         let query: String = env::args().nth(1).unwrap();
@@ -141,6 +141,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         match jira.search().iter(query, &Default::default()) {
             Ok(results) => {
                 for issue in results {
+                    print!("{} - ", issue.key);
                     let mut story_points: Option<f64> = None;
                     for (key, value) in issue.fields.iter() {
                         if story_point_fields.contains_key(key) {
@@ -155,7 +156,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 .unwrap_or(&0)
                                 + 1,
                         );
+                        print!("{} - ", issue_type.name);
                         if issue_type.name.to_lowercase().contains("epic") {
+                            println!();
                             continue;
                         }
                         story_points_by_issue_type.insert(
@@ -165,7 +168,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 .unwrap_or(&0.0)
                                 + story_points.unwrap_or(0.0),
                         );
-                        if story_points == None {
+                        if story_points.is_none() {
                             story_points_unset_by_issue_type.insert(
                                 issue_type.name.clone(),
                                 story_points_unset_by_issue_type
@@ -181,6 +184,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         } else {
                             status.name.clone()
                         };
+                        println!("{} ", status.name);
                         issue_count_by_status.insert(
                             status_name.clone(),
                             issue_count_by_status.get(&status_name).unwrap_or(&0) + 1,
@@ -195,7 +199,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     total_story_points += story_points.unwrap_or(0.0);
                 }
             }
-            Err(err) => panic!("{:#?}", err),
+            Err(err) => panic!("{err:#?}"),
         }
 
         print_stats_for_humans(

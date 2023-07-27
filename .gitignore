@@ -2,3 +2,5 @@
 /target
 *.iml
 .env
+.DS_Store
+result
