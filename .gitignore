@@ -4,3 +4,4 @@
 .env
 .DS_Store
 result
+jira-tools.toml

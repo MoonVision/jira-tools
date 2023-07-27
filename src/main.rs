@@ -99,14 +99,29 @@ fn print_stats_for_humans(
     println!("Story points:     {total_story_points}");
 }
 
+#[derive(Debug, Deserialize)]
+struct JiraToolsConfig {
+    host: String,
+    username: String,
+    password: String,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     drop(env_logger::init());
-    if let (Ok(jira_host), Ok(jira_user), Ok(jira_pass)) = (
-        env::var("JIRA_HOST"),
-        env::var("JIRA_USER"),
-        env::var("JIRA_PASS"),
-    ) {
+
+    let cb: Result<JiraToolsConfig, config::ConfigError> = config::Config::builder()
+        .add_source(config::File::with_name("jira-tools.toml").required(false))
+        .add_source(config::File::with_name("~/.config/jira-tools.toml").required(false))
+        .add_source(config::File::with_name("/etc/jira-tools.toml").required(false))
+        .add_source(config::Environment::with_prefix("JIRA"))
+        .build()?
+        .try_deserialize();
+
+    if let Ok(conf) = cb {
+        let jira_host = conf.host;
+        let jira_user = conf.username;
+        let jira_pass = conf.password;
         let field_endpoint = format!("{jira_host}/rest/api/3/field");
         let resp = reqwest::Client::new()
             .get(field_endpoint)
