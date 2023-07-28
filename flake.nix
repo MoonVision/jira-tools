@@ -12,7 +12,13 @@
         naersk-lib = pkgs.callPackage naersk { };
       in
       {
-        defaultPackage = naersk-lib.buildPackage ./.;
+        defaultPackage = naersk-lib.buildPackage {
+          src =./.;
+          buildInputs = with pkgs; [
+            openssl
+            pkg-config
+          ];
+        };
         devShell = with pkgs; mkShell {
           buildInputs = [
             cargo
