@@ -229,6 +229,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
         Ok(())
     } else {
-        create_error("Env variables JIRA_HOST, JIRA_USER & JIRA_PASS need to be set!")
+        create_error("Env variables JIRA_HOST, JIRA_USERNAME & JIRA_PASSWORD need to be set!")
     }
 }
