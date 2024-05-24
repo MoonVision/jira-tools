@@ -5,6 +5,11 @@
     utils.url = "github:numtide/flake-utils";
   };
 
+  nixConfig = {
+    extra-substituters = [ "https://attic.internal.moonvision.io/moonvision-foss" ];
+    extra-trusted-public-keys = [ "moonvision-foss:9nKTaMgGQ1M1+CYCftDNWQD39fESVxcp9o8GwRf1B3M=" ];
+  };
+
   outputs = {
     self,
     nixpkgs,
