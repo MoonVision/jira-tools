@@ -22,4 +22,4 @@ jobs:
       - name: Building package
         run: nix build
       - name: Push result to cache
-        run: nix run nixpkgs#attic-client push result
+        run: nix run nixpkgs#attic-client push moonvision-foss result
