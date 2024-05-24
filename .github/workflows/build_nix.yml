@@ -35,4 +35,5 @@ jobs:
       - name: Building package
         run: nix build .#packages.${{ matrix.system }}.default
       - name: Push result to cache
+        if: ${{ github.event.pull_request.head.repo.full_name == 'MoonVision/jira-tools' }}
         run: nix run nixpkgs#attic-client push moonvision-foss result
