@@ -19,16 +19,28 @@
     utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
       naersk-lib = pkgs.callPackage naersk {};
+      apple-sdk = pkgs.lib.optionals pkgs.stdenv.isDarwin (
+        with pkgs.darwin.apple_sdk.frameworks; [
+          AppKit
+          CoreFoundation
+          CoreServices
+          Foundation
+          Security
+          SystemConfiguration
+        ]
+      );
     in {
       defaultPackage = self.packages.${system}.jira-tools;
       packages = {
         default = self.packages.${system}.jira-tools;
         jira-tools = naersk-lib.buildPackage {
           src = ./.;
-          buildInputs = with pkgs; [
-            openssl
-            pkg-config
-          ];
+          buildInputs = with pkgs;
+            [
+              openssl
+              pkg-config
+            ]
+            ++ apple-sdk;
         };
       };
       devShell = with pkgs;
@@ -43,14 +55,7 @@
               pre-commit
               rustPackages.clippy
             ]
-            ++ (lib.optionals pkgs.stdenv.isDarwin (with pkgs.darwin.apple_sdk.frameworks; [
-              AppKit
-              CoreFoundation
-              CoreServices
-              Foundation
-              Security
-              SystemConfiguration
-            ]));
+            ++ apple-sdk;
           RUST_SRC_PATH = rustPlatform.rustLibSrc;
         };
       formatter = pkgs.alejandra;
