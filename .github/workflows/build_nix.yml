@@ -20,6 +20,6 @@ jobs:
           nix run nixpkgs#attic-client login internal "https://attic.internal.moonvision.io" "${{ secrets.ATTIC_SECRET_KEY }}"
           nix run nixpkgs#attic-client use moonvision-foss
       - name: Building package
-        run: nix-build . -A defaultPackage.x86_64-linux
+        run: nix build
       - name: Push result to cache
         run: nix run nixpkgs#attic-client push result
