@@ -1,6 +1,6 @@
 extern crate env_logger;
-extern crate goji;
-use goji::{Credentials, Jira};
+extern crate gouqi;
+use gouqi::{Credentials, Jira};
 use serde_derive::Deserialize;
 use std::collections::HashMap;
 use std::env;
@@ -108,7 +108,7 @@ struct JiraToolsConfig {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    drop(env_logger::init());
+    env_logger::init();
     let xdg_dirs = xdg::BaseDirectories::with_prefix("jira-tools").unwrap();
     let xdg_config_path = xdg_dirs.get_config_file("jira-tools.toml");
     let xdg_config = xdg_config_path.to_str().unwrap_or("jira-tools.toml");
