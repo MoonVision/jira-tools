@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 config = "0.14"
 env_logger = "0.11"
+gouqi = "*"
 headers-core = "0.3"
 serde = "1"
 serde_derive = "1"
@@ -16,9 +17,6 @@ tokio = { version = "1", features = ["full"] }
 url = "2"
 xdg = "2"
 
-[dependencies.goji]
-git = "https://github.com/softprops/goji.git"
-rev = "5916526332951a144b6f6fd7c94d02ea56fdad31"
 
 [dependencies.reqwest]
 version = "0.11"
