@@ -9,5 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: cachix/install-nix-action@v12
+      - name: Install attic
+        run: |
+          nix run github:nixos/nixpkgs/nixos-24.05#attic-client login internal "https://attic.internal.moonvision.io" "${ATTIC_SECRET_KEY}"
+          nix run github:nixos/nixpkgs/nixos-24.05#attic-client use moonvision-foss
       - name: Building package
         run: nix-build . -A defaultPackage.x86_64-linux
+      - name: Push result to cache
+        run: nix run github:nixos/nixpkgs/nixos-24.05#attic-client push result
