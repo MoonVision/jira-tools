@@ -6,8 +6,8 @@
   };
 
   nixConfig = {
-    extra-substituters = [ "https://attic.internal.moonvision.io/moonvision-foss" ];
-    extra-trusted-public-keys = [ "moonvision-foss:9nKTaMgGQ1M1+CYCftDNWQD39fESVxcp9o8GwRf1B3M=" ];
+    extra-substituters = ["https://attic.internal.moonvision.io/moonvision-foss"];
+    extra-trusted-public-keys = ["moonvision-foss:9nKTaMgGQ1M1+CYCftDNWQD39fESVxcp9o8GwRf1B3M="];
   };
 
   outputs = {
@@ -43,13 +43,14 @@
               pre-commit
               rustPackages.clippy
             ]
-            ++ (lib.optionals pkgs.stdenv.isDarwin [
-              pkgs.darwin.apple_sdk.frameworks.AppKit
-              pkgs.darwin.apple_sdk.frameworks.CoreFoundation
-              pkgs.darwin.apple_sdk.frameworks.CoreServices
-              pkgs.darwin.apple_sdk.frameworks.Foundation
-              pkgs.darwin.apple_sdk.frameworks.Security
-            ]);
+            ++ (lib.optionals pkgs.stdenv.isDarwin (with pkgs.darwin.apple_sdk.frameworks; [
+              AppKit
+              CoreFoundation
+              CoreServices
+              Foundation
+              Security
+              SystemConfiguration
+            ]));
           RUST_SRC_PATH = rustPlatform.rustLibSrc;
         };
       formatter = pkgs.alejandra;
