@@ -15,12 +15,16 @@
       pkgs = import nixpkgs {inherit system;};
       naersk-lib = pkgs.callPackage naersk {};
     in {
-      defaultPackage = naersk-lib.buildPackage {
-        src = ./.;
-        buildInputs = with pkgs; [
-          openssl
-          pkg-config
-        ];
+      defaultPackage = self.packages.${system}.jira-tools;
+      packages = {
+        default = self.packages.${system}.jira-tools;
+        jira-tools = naersk-lib.buildPackage {
+          src = ./.;
+          buildInputs = with pkgs; [
+            openssl
+            pkg-config
+          ];
+        };
       };
       devShell = with pkgs;
         mkShell {
