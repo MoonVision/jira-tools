@@ -20,6 +20,50 @@ jobs:
           nix run nixpkgs#attic-client login internal "https://attic.internal.moonvision.io" "${{ secrets.ATTIC_SECRET_KEY }}"
           nix run nixpkgs#attic-client use moonvision-foss
       - name: Building package
-        run: nix build
+        run: nix build .#packages.x86_64-linux.default
+      - name: Push result to cache
+        run: nix run nixpkgs#attic-client push moonvision-foss result
+  build-x86_64-darwin:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rosetta
+        run: sudo softwareupdate --install-rosetta --agree-to-license
+      - uses: cachix/install-nix-action@v27
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            extra-platforms = x86_64-darwin aarch64-darwin
+            accept-flake-config = true
+      - name: Install attic
+        run: |
+          nix run nixpkgs#attic-client login internal "https://attic.internal.moonvision.io" "${{ secrets.ATTIC_SECRET_KEY }}"
+          nix run nixpkgs#attic-client use moonvision-foss
+      - name: Building package
+        run: nix build .#packages.x86_64-darwin.default
+      - name: Push result to cache
+        run: nix run nixpkgs#attic-client push moonvision-foss result
+  build-aarch64-darwin:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rosetta
+        run: sudo softwareupdate --install-rosetta --agree-to-license
+      - uses: cachix/install-nix-action@v27
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            extra-platforms = x86_64-darwin aarch64-darwin
+            accept-flake-config = true
+      - name: Install attic
+        run: |
+          nix run nixpkgs#attic-client login internal "https://attic.internal.moonvision.io" "${{ secrets.ATTIC_SECRET_KEY }}"
+          nix run nixpkgs#attic-client use moonvision-foss
+      - name: Building package
+        run: nix build .#packages.aarch64-darwin.default
       - name: Push result to cache
         run: nix run nixpkgs#attic-client push moonvision-foss result
