@@ -1,4 +1,4 @@
-name: "Build legacy Nix package on Ubuntu"
+name: "Build Nix packages for various platforms"
 
 on:
   push:
