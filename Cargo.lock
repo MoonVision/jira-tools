@@ -613,7 +613,8 @@ checksum = "0cc23270f6e1808e30a928bdc84dea0b9b4136a8bc82338574f23baf47bbd280"
 [[package]]
 name = "gouqi"
 version = "0.15.0"
-source = "git+https://github.com/wunderfrucht/gouqi.git?rev=a6dd44f5a939d8cb4c547c6b508288258b960c8a#a6dd44f5a939d8cb4c547c6b508288258b960c8a"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7abd782d8bc77f0416da0d36ffef89745c9dd3b81e2bcb24f00a7924fdee3aaf"
 dependencies = [
  "futures",
  "humantime-serde",

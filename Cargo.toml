@@ -20,8 +20,7 @@ url = "2"
 xdg = "3"
 
 [dependencies.gouqi]
-git="https://github.com/wunderfrucht/gouqi.git"
-rev="a6dd44f5a939d8cb4c547c6b508288258b960c8a"
+version = "0.15"
 features = ["async"]
 
 [dependencies.reqwest]
