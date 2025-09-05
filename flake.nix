@@ -1,8 +1,15 @@
 {
   inputs = {
-    naersk.url = "github:nix-community/naersk/master";
+    naersk = {
+      url = "github:nix-community/naersk/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     utils.url = "github:numtide/flake-utils";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {
@@ -15,20 +22,23 @@
     nixpkgs,
     utils,
     naersk,
+    rust-overlay,
   }:
     utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs {inherit system;};
-      naersk-lib = pkgs.callPackage naersk {};
-      apple-sdk = pkgs.lib.optionals pkgs.stdenv.isDarwin (
-        with pkgs.darwin.apple_sdk.frameworks; [
-          AppKit
-          CoreFoundation
-          CoreServices
-          Foundation
-          Security
-          SystemConfiguration
-        ]
-      );
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [(import rust-overlay)];
+      };
+      toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+      naersk-lib = pkgs.callPackage naersk {
+        cargo = toolchain;
+        rustc = toolchain;
+        clippy = toolchain;
+      };
+      apple-sdk = pkgs.lib.optionals pkgs.stdenv.isDarwin
+        [
+          pkgs.apple-sdk
+        ];
     in {
       defaultPackage = self.packages.${system}.jira-tools;
       packages = {
@@ -47,16 +57,12 @@
         mkShell {
           buildInputs =
             [
-              cargo
               libiconv
               openssl
-              rustc
-              rustfmt
               pre-commit
-              rustPackages.clippy
             ]
             ++ apple-sdk;
-          RUST_SRC_PATH = rustPlatform.rustLibSrc;
+          # RUST_SRC_PATH = rustPlatform.rustLibSrc;
         };
       formatter = pkgs.alejandra;
     });
