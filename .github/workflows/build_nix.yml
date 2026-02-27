@@ -29,11 +29,12 @@ jobs:
         if: ${{ contains(matrix.system, 'x86_64-darwin') }}
         run: sudo softwareupdate --install-rosetta --agree-to-license
       - name: Install attic
+        if: github.actor != 'dependabot[bot]'
         run: |
           nix run nixpkgs#attic-client login internal "https://attic.internal.moonvision.io" "${{ secrets.ATTIC_SECRET_KEY }}"
           nix run nixpkgs#attic-client use moonvision-foss
       - name: Building package
         run: nix build .#packages.${{ matrix.system }}.default
       - name: Push result to cache
-        if: "! github.event.pull_request.head.repo.fork "
+        if: "! github.event.pull_request.head.repo.fork && github.actor != 'dependabot[bot]'"
         run: nix run nixpkgs#attic-client push moonvision-foss result
