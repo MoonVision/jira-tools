@@ -35,7 +35,8 @@
         rustc = toolchain;
         clippy = toolchain;
       };
-      apple-sdk = pkgs.lib.optionals pkgs.stdenv.isDarwin
+      apple-sdk =
+        pkgs.lib.optionals pkgs.stdenv.isDarwin
         [
           pkgs.apple-sdk
         ];
