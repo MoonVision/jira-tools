@@ -139,13 +139,40 @@ struct JiraToolsConfig {
     password: String,
 }
 
+fn print_usage() {
+    println!("Usage: jira-tools <command> [args]");
+    println!("\nCommands:");
+    println!("  stats <JIRA_QUERY>    Show statistics for the given Jira query");
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
-    // tracing_subscriber::fmt()
-    //     .with_max_level(tracing::Level::DEBUG)
-    //     .with_target(false)
-    //     .init();
+
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        print_usage();
+        return Ok(());
+    }
+
+    let command = &args[1];
+    match command.as_str() {
+        "stats" => {
+            if args.len() < 3 {
+                return create_error("Argument JIRA_QUERY required for 'stats' command!");
+            }
+            let query: String = args[2].clone();
+            run_stats(query).await
+        }
+        _ => {
+            println!("Unknown command: {}\n", command);
+            print_usage();
+            Ok(())
+        }
+    }
+}
+
+async fn run_stats(query: String) -> Result<(), Box<dyn std::error::Error>> {
     let xdg_dirs = xdg::BaseDirectories::with_prefix("jira-tools");
     let xdg_config_path = xdg_dirs.get_config_file("jira-tools.toml").unwrap();
     let xdg_config = xdg_config_path.to_str().unwrap_or("jira-tools.toml");
@@ -176,11 +203,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             story_point_fields.insert(jira_field.id.clone(), jira_field);
         });
 
-    let first_arg = env::args().nth(1);
-    if first_arg.is_none() {
-        return create_error("Argument JIRA_QUERY required!");
-    }
-    let query: String = env::args().nth(1).unwrap();
     let jira = gouqi::r#async::Jira::new(jira_host, Credentials::Basic(jira_user, jira_pass))
         .expect("Error initializing Jira");
 
