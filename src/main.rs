@@ -1,7 +1,10 @@
 extern crate env_logger;
 extern crate gouqi;
+use comfy_table::presets::UTF8_FULL;
+use comfy_table::{Cell, CellAlignment, Table};
 use futures::stream::StreamExt;
 use gouqi::{Credentials, SearchOptions};
+use owo_colors::OwoColorize;
 use serde_derive::Deserialize;
 use std::collections::HashMap;
 use std::env;
@@ -44,60 +47,89 @@ fn print_stats_for_humans(
     total_story_points: f64,
     total_issue_count: u32,
 ) {
-    println!("\nIssue count by issue type:");
-    println!("==========================");
-    issue_count_by_issue_type
-        .iter()
-        .for_each(|(issue_type, issue_count)| {
-            println!("Issue type:   {issue_type}");
-            println!("Issue count:  {issue_count}");
-            println!("-----");
-        });
+    println!("\n{}", "Issue count by issue type:".bold());
+    let mut table = Table::new();
+    table
+        .load_preset(UTF8_FULL)
+        .set_header(vec!["Issue Type", "Count"]);
+    for (issue_type, issue_count) in issue_count_by_issue_type.iter() {
+        table.add_row(vec![
+            Cell::new(issue_type),
+            Cell::new(issue_count).set_alignment(CellAlignment::Right),
+        ]);
+    }
+    println!("{table}");
 
-    println!("\nStory points by issue type:");
-    println!("===========================");
-    story_points_by_issue_type
-        .iter()
-        .for_each(|(issue_type, story_points)| {
-            println!("Issue type:   {issue_type}");
-            println!("Story points: {story_points}");
-            println!("-----");
-        });
+    println!("\n{}", "Story points by issue type:".bold());
+    let mut table = Table::new();
+    table
+        .load_preset(UTF8_FULL)
+        .set_header(vec!["Issue Type", "Story Points"]);
+    for (issue_type, story_points) in story_points_by_issue_type.iter() {
+        table.add_row(vec![
+            Cell::new(issue_type),
+            Cell::new(story_points).set_alignment(CellAlignment::Right),
+        ]);
+    }
+    println!("{table}");
 
-    println!("\nUnset SPs by issue type:");
-    println!("========================");
-    story_points_unset_by_issue_type
-        .iter()
-        .for_each(|(issue_type, unset_count)| {
-            println!("Issue type:   {issue_type}");
-            println!("Unset count:  {unset_count}");
-            println!("-----");
-        });
+    println!("\n{}", "Unset SPs by issue type:".bold());
+    let mut table = Table::new();
+    table
+        .load_preset(UTF8_FULL)
+        .set_header(vec!["Issue Type", "Unset Count"]);
+    for (issue_type, unset_count) in story_points_unset_by_issue_type.iter() {
+        table.add_row(vec![
+            Cell::new(issue_type),
+            Cell::new(unset_count).set_alignment(CellAlignment::Right),
+        ]);
+    }
+    if story_points_unset_by_issue_type.is_empty() {
+        println!("No issues with unset story points.");
+    } else {
+        println!("{table}");
+    }
 
-    println!("\nIssue count by status:");
-    println!("======================");
-    issue_count_by_status
-        .iter()
-        .for_each(|(status, issue_count)| {
-            println!("Status:       {status}");
-            println!("Issue count:  {issue_count}");
-            println!("-----");
-        });
+    println!("\n{}", "Issue count by status:".bold());
+    let mut table = Table::new();
+    table
+        .load_preset(UTF8_FULL)
+        .set_header(vec!["Status", "Count"]);
+    for (status, issue_count) in issue_count_by_status.iter() {
+        table.add_row(vec![
+            Cell::new(status),
+            Cell::new(issue_count).set_alignment(CellAlignment::Right),
+        ]);
+    }
+    println!("{table}");
 
-    println!("\nStory points by status:");
-    println!("=======================");
-    story_points_by_status
-        .iter()
-        .for_each(|(status, story_points)| {
-            println!("Status:       {status}");
-            println!("Story points: {story_points}");
-            println!("-----");
-        });
+    println!("\n{}", "Story points by status:".bold());
+    let mut table = Table::new();
+    table
+        .load_preset(UTF8_FULL)
+        .set_header(vec!["Status", "Story Points"]);
+    for (status, story_points) in story_points_by_status.iter() {
+        table.add_row(vec![
+            Cell::new(status),
+            Cell::new(story_points).set_alignment(CellAlignment::Right),
+        ]);
+    }
+    println!("{table}");
 
-    println!("\nTotals:");
-    println!("=========");
-    println!("Issue count:      {total_issue_count}");
-    println!("Story points:     {total_story_points}");
+    println!("\n{}", "Totals:".bold());
+    let mut table = Table::new();
+    table
+        .load_preset(UTF8_FULL)
+        .set_header(vec!["Metric", "Total"]);
+    table.add_row(vec![
+        Cell::new("Issue Count"),
+        Cell::new(total_issue_count).set_alignment(CellAlignment::Right),
+    ]);
+    table.add_row(vec![
+        Cell::new("Story Points"),
+        Cell::new(total_story_points).set_alignment(CellAlignment::Right),
+    ]);
+    println!("{table}");
 }
 
 #[derive(Debug, Deserialize)]
@@ -168,7 +200,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
         .expect("Error starting search stream");
     while let Some(issue) = stream.next().await {
-        print!("{} - ", issue.key);
+        print!("{} - ", issue.key.blue().bold());
         let mut story_points: Option<f64> = None;
         for (key, value) in issue.fields.iter() {
             if story_point_fields.contains_key(key) {
@@ -183,7 +215,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .unwrap_or(&0)
                     + 1,
             );
-            print!("{} - ", issue_type.name);
+            print!("{} - ", issue_type.name.yellow());
             if issue_type.name.to_lowercase().contains("epic") {
                 println!();
                 continue;
@@ -211,7 +243,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             } else {
                 status.name.clone()
             };
-            println!("{} ", status.name);
+            println!("{} ", status.name.green());
             issue_count_by_status.insert(
                 status_name.clone(),
                 issue_count_by_status.get(&status_name).unwrap_or(&0) + 1,
