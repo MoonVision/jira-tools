@@ -47,28 +47,17 @@ fn print_stats_for_humans(
     total_story_points: f64,
     total_issue_count: u32,
 ) {
-    println!("\n{}", "Issue count by issue type:".bold());
+    println!("\n{}", "Issues by type:".bold());
     let mut table = Table::new();
     table
         .load_preset(UTF8_FULL)
-        .set_header(vec!["Issue Type", "Count"]);
+        .set_header(vec!["Issue Type", "Count", "Story Points"]);
     for (issue_type, issue_count) in issue_count_by_issue_type.iter() {
+        let sp = story_points_by_issue_type.get(issue_type).unwrap_or(&0.0);
         table.add_row(vec![
             Cell::new(issue_type),
             Cell::new(issue_count).set_alignment(CellAlignment::Right),
-        ]);
-    }
-    println!("{table}");
-
-    println!("\n{}", "Story points by issue type:".bold());
-    let mut table = Table::new();
-    table
-        .load_preset(UTF8_FULL)
-        .set_header(vec!["Issue Type", "Story Points"]);
-    for (issue_type, story_points) in story_points_by_issue_type.iter() {
-        table.add_row(vec![
-            Cell::new(issue_type),
-            Cell::new(story_points).set_alignment(CellAlignment::Right),
+            Cell::new(sp).set_alignment(CellAlignment::Right),
         ]);
     }
     println!("{table}");
@@ -90,28 +79,17 @@ fn print_stats_for_humans(
         println!("{table}");
     }
 
-    println!("\n{}", "Issue count by status:".bold());
+    println!("\n{}", "Issues by status:".bold());
     let mut table = Table::new();
     table
         .load_preset(UTF8_FULL)
-        .set_header(vec!["Status", "Count"]);
+        .set_header(vec!["Status", "Count", "Story Points"]);
     for (status, issue_count) in issue_count_by_status.iter() {
+        let sp = story_points_by_status.get(status).unwrap_or(&0.0);
         table.add_row(vec![
             Cell::new(status),
             Cell::new(issue_count).set_alignment(CellAlignment::Right),
-        ]);
-    }
-    println!("{table}");
-
-    println!("\n{}", "Story points by status:".bold());
-    let mut table = Table::new();
-    table
-        .load_preset(UTF8_FULL)
-        .set_header(vec!["Status", "Story Points"]);
-    for (status, story_points) in story_points_by_status.iter() {
-        table.add_row(vec![
-            Cell::new(status),
-            Cell::new(story_points).set_alignment(CellAlignment::Right),
+            Cell::new(sp).set_alignment(CellAlignment::Right),
         ]);
     }
     println!("{table}");
