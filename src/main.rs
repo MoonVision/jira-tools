@@ -216,6 +216,11 @@ async fn run_stats(query: String) -> Result<(), Box<dyn std::error::Error>> {
                     + 1,
             );
             print!("{} - ", issue_type.name.yellow());
+            if let Some(sp) = story_points {
+                print!("{} SP - ", sp.cyan());
+            } else {
+                print!("? SP - ");
+            }
             if issue_type.name.to_lowercase().contains("epic") {
                 println!();
                 continue;
