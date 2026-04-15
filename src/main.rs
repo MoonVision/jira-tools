@@ -200,7 +200,7 @@ async fn run_stats(query: String) -> Result<(), Box<dyn std::error::Error>> {
         .await
         .expect("Error starting search stream");
     while let Some(issue) = stream.next().await {
-        print!("{} - ", issue.key.blue().bold());
+        print!("{:>8} - ", issue.key.blue().bold());
         let mut story_points: Option<f64> = None;
         for (key, value) in issue.fields.iter() {
             if story_point_fields.contains_key(key) {
@@ -215,12 +215,7 @@ async fn run_stats(query: String) -> Result<(), Box<dyn std::error::Error>> {
                     .unwrap_or(&0)
                     + 1,
             );
-            print!("{} - ", issue_type.name.yellow());
-            if let Some(sp) = story_points {
-                print!("{} SP - ", sp.cyan());
-            } else {
-                print!("? SP - ");
-            }
+            print!("{:<5} - ", issue_type.name.yellow());
             if issue_type.name.to_lowercase().contains("epic") {
                 println!();
                 continue;
@@ -248,7 +243,7 @@ async fn run_stats(query: String) -> Result<(), Box<dyn std::error::Error>> {
             } else {
                 status.name.clone()
             };
-            println!("{} ", status.name.green());
+            print!("{:<11} - ", status.name.green());
             issue_count_by_status.insert(
                 status_name.clone(),
                 issue_count_by_status.get(&status_name).unwrap_or(&0) + 1,
@@ -259,6 +254,12 @@ async fn run_stats(query: String) -> Result<(), Box<dyn std::error::Error>> {
                     + story_points.unwrap_or(0.0),
             );
         }
+        if let Some(sp) = story_points {
+            print!("{:>3} SP", sp.cyan());
+        } else {
+            print!("  ? SP");
+        }
+        println!();
         total_issue_count += 1;
         total_story_points += story_points.unwrap_or(0.0);
     }
