@@ -57,12 +57,18 @@ pub async fn run_stats(query: String) -> Result<(), Box<dyn std::error::Error>> 
         .get(field_endpoint)
         .basic_auth(jira_user.clone(), Some(jira_pass.clone()))
         .send()
-        .await?
-        .json::<Vec<JiraField>>()
         .await?;
+        
+    if let Some(reason) = resp.headers().get("x-seraph-loginreason") {
+        if reason == "AUTHENTICATED_FAILED" {
+            return Err("Jira authentication failed. Please check your credentials (ensure you use your Atlassian account email address and a valid API token).".into());
+        }
+    }
+        
+    let resp_fields = resp.json::<Vec<JiraField>>().await?;
 
     let mut story_point_fields: HashMap<String, &JiraField> = HashMap::new();
-    resp.iter()
+    resp_fields.iter()
         .filter(|jira_field| jira_field.name.to_lowercase().contains("story point"))
         .for_each(|jira_field| {
             story_point_fields.insert(jira_field.id.clone(), jira_field);
