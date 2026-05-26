@@ -17,10 +17,7 @@ fn print_usage() {
     println!("  stats <JIRA_QUERY>    Show statistics for the given Jira query");
 }
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    env_logger::init();
-
+async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
         print_usage();
@@ -41,5 +38,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             print_usage();
             Ok(())
         }
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    env_logger::init();
+
+    if let Err(e) = run().await {
+        eprintln!("Error: {}", e);
+        std::process::exit(1);
     }
 }

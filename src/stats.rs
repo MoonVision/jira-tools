@@ -58,13 +58,16 @@ pub async fn run_stats(query: String) -> Result<(), Box<dyn std::error::Error>> 
         .basic_auth(jira_user.clone(), Some(jira_pass.clone()))
         .send()
         .await?;
-        
+
     if let Some(reason) = resp.headers().get("x-seraph-loginreason") {
         if reason == "AUTHENTICATED_FAILED" {
-            return Err("Jira authentication failed. Please check your credentials (ensure you use your Atlassian account email address and a valid API token).".into());
+            return Err("Jira authentication failed (ensure you use your Atlassian account email address and a valid API token).
+You can provide credentials via:
+1. Environment variables: JIRA_USERNAME and JIRA_PASSWORD
+2. XDG config file: ~/.config/jira-tools/jira-tools.toml".into());
         }
     }
-        
+
     let resp_fields = resp.json::<Vec<JiraField>>().await?;
 
     let mut story_point_fields: HashMap<String, &JiraField> = HashMap::new();
